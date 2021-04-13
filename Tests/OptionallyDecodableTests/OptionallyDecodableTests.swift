@@ -1,12 +1,12 @@
 import XCTest
 @testable import OptionallyDecodable
 
-private struct Inner: Decodable {
+private struct Inner: Codable, Equatable {
     let string: String
     let number: Int
 }
 
-private struct Outer: Decodable {
+private struct Outer: Codable, Equatable {
     @OptionallyDecodable
     private(set) var inner: Inner?
 }
@@ -129,5 +129,43 @@ final class OptionallyDecodableTests: XCTestCase {
                          "Invalid enum value should be decoded as nil instead of throwing.")
         let bad = try JSONDecoder().decode(Object.self, from: badJSON)
         XCTAssertNil(bad.value, "Invalid enum value should be decoded as nil.")
+    }
+    
+    func testEncoding() throws {
+        let object = Outer(inner: Inner(string: "abc", number: 123))
+        _ = try JSONEncoder().encode(object)
+    }
+    
+    func testRoundtrip() throws {
+        let json = #"""
+        {
+            "inner": {
+                "string": "abc",
+                "number": 123
+            }
+        }
+        """#.data(using: .utf8)!
+        let decoded = try JSONDecoder().decode(Outer.self, from: json)
+        let encoded = try JSONEncoder().encode(decoded)
+        let recoded = try JSONDecoder().decode(Outer.self, from: encoded)
+        XCTAssertNotNil(recoded.inner,
+                        "Object should survive encode/decode roundtrip if correct.")
+        XCTAssertEqual(recoded, Outer(inner: Inner(string: "abc", number: 123)))
+    }
+    
+    func testRoundtripOfMalformedJSON() throws {
+        let json = #"""
+        {
+            "inner": {
+                "string": null,
+                "number": 123
+            }
+        }
+        """#.data(using: .utf8)!
+        let decoded = try JSONDecoder().decode(Outer.self, from: json)
+        let encoded = try JSONEncoder().encode(decoded)
+        let recoded = try JSONDecoder().decode(Outer.self, from: encoded)
+        XCTAssertNil(recoded.inner,
+                     "Object should survive encode/decode roundtrip if correct.")
     }
 }

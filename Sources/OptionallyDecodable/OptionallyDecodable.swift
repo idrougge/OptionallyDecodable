@@ -37,3 +37,14 @@ extension KeyedDecodingContainer {
         return decoded
     }
 }
+
+extension OptionallyDecodable: Encodable where Wrapped: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(wrappedValue)
+    }
+}
+
+extension OptionallyDecodable: Equatable where Wrapped: Equatable {}
+
+extension OptionallyDecodable: Hashable where Wrapped: Hashable {}
