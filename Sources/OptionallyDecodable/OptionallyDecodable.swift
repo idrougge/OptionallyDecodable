@@ -22,7 +22,7 @@ extension OptionallyDecodable: Decodable {
 }
 
 /// We need this protocol to circumvent how the Swift compiler currently handles non-existing fields for property wrappers, always failing when there is no matching key.
-protocol NullableCodable {
+public protocol NullableCodable {
     associatedtype Wrapped: Decodable, ExpressibleByNilLiteral
     var wrappedValue: Wrapped { get }
     init(wrappedValue: Wrapped)
@@ -32,7 +32,7 @@ extension OptionallyDecodable: NullableCodable {}
 
 extension KeyedDecodingContainer {
     /// Necessary for handling non-existing fields, due to how Swift compiler currently synthesises decoders for property wrappers, always failing when there is no matching key.
-    func decode<T: NullableCodable>(_ type: T.Type, forKey key: Key) throws -> T where T: Decodable {
+    public func decode<T: NullableCodable>(_ type: T.Type, forKey key: Key) throws -> T where T: Decodable {
         let decoded = try self.decodeIfPresent(T.self, forKey: key) ?? T(wrappedValue: nil)
         return decoded
     }
