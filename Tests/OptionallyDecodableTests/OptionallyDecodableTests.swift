@@ -1,22 +1,22 @@
 import XCTest
 @testable import OptionallyDecodable
 
-private struct Inner: Codable, Equatable {
+private struct Inner: Codable, Equatable, Sendable {
     let string: String
     let number: Int
 }
 
 private struct Outer: Codable, Equatable {
     @OptionallyDecodable
-    private(set) var inner: Inner?
+    var inner: Inner?
 }
 
-private struct Outermost: Decodable {
-    struct Inside: Decodable {
+private struct Outermost: Decodable, Sendable {
+    struct Inside: Decodable, Sendable {
         let innermost: Inner
     }
     @OptionallyDecodable
-    private(set) var inside: Inside?
+    var inside: Inside?
 }
 
 final class OptionallyDecodableTests: XCTestCase {

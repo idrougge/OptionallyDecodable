@@ -7,7 +7,7 @@
 
 /// Decodes a value when possible, otherwise yielding `nil`, for more resilient handling of JSON with unexpected shapes such as missing fields or incorrect types. Normally, this would throw a `DecodingError`, aborting the decoding process even of the parent object.
 @propertyWrapper public struct OptionallyDecodable<Wrapped: Decodable> {
-    public var wrappedValue: Wrapped?
+    public let wrappedValue: Wrapped?
     
     public init(wrappedValue: Wrapped?) {
         self.wrappedValue = wrappedValue
@@ -48,3 +48,5 @@ extension OptionallyDecodable: Encodable where Wrapped: Encodable {
 extension OptionallyDecodable: Equatable where Wrapped: Equatable {}
 
 extension OptionallyDecodable: Hashable where Wrapped: Hashable {}
+
+extension OptionallyDecodable: Sendable where Wrapped: Sendable {}
