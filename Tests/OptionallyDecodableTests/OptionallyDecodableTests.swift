@@ -1,14 +1,20 @@
 import XCTest
 @testable import OptionallyDecodable
 
-private struct Inner: Codable, Equatable {
+private struct Inner: Codable, Equatable{
     let string: String
     let number: Int
 }
 
+#if swift(>=5.5)
+extension Inner: Sendable {}
+extension Outermost: Sendable {}
+extension Outermost.Inside: Sendable {}
+#endif
+
 private struct Outer: Codable, Equatable {
     @OptionallyDecodable
-    private(set) var inner: Inner?
+    var inner: Inner?
 }
 
 private struct Outermost: Decodable {
@@ -16,7 +22,7 @@ private struct Outermost: Decodable {
         let innermost: Inner
     }
     @OptionallyDecodable
-    private(set) var inside: Inside?
+    var inside: Inside?
 }
 
 final class OptionallyDecodableTests: XCTestCase {
