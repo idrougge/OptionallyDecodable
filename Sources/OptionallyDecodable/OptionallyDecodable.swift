@@ -49,4 +49,6 @@ extension OptionallyDecodable: Equatable where Wrapped: Equatable {}
 
 extension OptionallyDecodable: Hashable where Wrapped: Hashable {}
 
+#if swift(>=5.5)
 extension OptionallyDecodable: Sendable where Wrapped: Sendable {}
+#endif
